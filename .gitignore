@@ -1,0 +1,26 @@
+# Node / JS tooling
+node_modules/
+.npm/
+coverage/
+playwright-report/
+test-results/
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+.dist/
+dist/
+build/
+out/
+.cache/
+.next/
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
