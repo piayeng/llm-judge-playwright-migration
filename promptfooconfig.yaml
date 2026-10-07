@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Learn more about building a configuration: https://promptfoo.dev/docs/configuration/guide
+# Create 'promptfooconfig.yaml' to orchestrate models, load test vectors, and connect the judge logic.
+
+description: "LLM-as-a-Judge Playwright Code Migration Benchmarking"
+
+prompts:
+  - file://prompts/migration_prompt.txt
+  
+#A temperature of 0.1 in Large Language Model (LLM) evaluation or inference means the model operates with high determinism and low randomness.
+providers:
+  - id: openai:gpt-4o
+    config:
+      temperature: 0.1
+  
+tests:
+  - file://tests/test_cases.json
+
+# Define default configuration settings for the LLM judge provider
+env:
+  PROMPTFOO_SHORT_CIRCUIT: "true"

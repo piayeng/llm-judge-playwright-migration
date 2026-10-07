@@ -1,0 +1,46 @@
+You are an expert QA Automation Engineer. Convert the following legacy test script into a modern, runnable Playwright TypeScript test using @playwright/test.
+
+Requirements:
+- Write TypeScript, not JavaScript.
+- Start with `import { test, expect } from '@playwright/test';` (or `import { test, expect, request } from '@playwright/test';` when API calls are needed).
+- Use semantic, resilient locators such as `page.getByRole()`, `page.getByLabel()`, `page.getByTestId()`, and `locator('input[name="..."]')`. Avoid `FindChild`, `FindElement`, `Aliases`, `Browser(...)`, `Page(...)`, fragile XPath, brittle CSS selectors, and hardcoded sleep/wait calls.
+- Use web-first assertions (`await expect(locator).toHaveText(...)`, `toBeVisible()`, `toBeHidden()`, `toHaveScreenshot()`, etc.) and proper async/await.
+- Prefer the Playwright fixtures and lifecycle hooks built into @playwright/test: `page`, `context`, `request`, `test.beforeEach()`, `test.afterEach()`, `test.describe()`, and `storageState`/global setup when login persistence is required.
+- Do not invent Playwright APIs. If a feature has no direct Playwright equivalent, use the closest standard Node.js pattern with a brief explanatory code comment.
+- Use env vars or config values instead of hardcoded credentials, file paths, and URLs whenever a value is sensitive or environment-specific.
+- Do not put plaintext secrets, decrypted credentials, or hardcoded Windows paths such as `C:\Data\users.xlsx` or `C:\TestData\resume.pdf` into generated code unless they are explicitly sourced from env/config variables.
+- Produce only runnable code in one fenced code block and no extra prose.
+
+Critical conversion patterns:
+- Iframe: `const frame = page.frameLocator('iframe[name="payment-gate"]');` or `page.locator('iframe').contentFrame()`. Then use `frame.getByLabel(...)` or `frame.locator(...)`.
+- Dropdown/select: `await page.getByLabel('State').selectOption('Texas');`
+- Checkbox: `await page.getByLabel('Newsletter').check();`
+- Row-by-text action: `const row = page.getByRole('row').filter({ hasText: 'INV-1042' }); await row.getByRole('button').click();`
+- Alert/dialog: register `page.on('dialog', async dialog => { expect(dialog.message()).toContain(...); await dialog.accept(); });` before the click that triggers it. Do not attach the handler after the click.
+- Popup/new page: start the wait before the click, e.g. `const [popup] = await Promise.all([context.waitForEvent('page'), page.getByRole('link', { name: 'Help' }).click()]);` and then interact with `popup`.
+- Hover menu: `await parent.hover(); await submenu.click();`
+- Drag/drop: `await source.dragTo(target);`
+- File upload: `await page.locator('input[type="file"]').setInputFiles(process.env.RESUME_FILE_PATH || 'fixtures/resume.pdf');` Use a relative or config-driven path instead of a hardcoded Windows absolute path.
+- Download: create the wait before the click, e.g. `const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export CSV' }).click()]);` Then validate the downloaded filename or saved content. Do not click twice and do not poll the Downloads folder.
+- Keyboard input: `await field.fill('wireless mouse'); await field.press('Enter');`
+- Data-driven tests: generate one Playwright test per data row using `for (const row of users) { test(...); }` or a parameterized pattern. Read data from JSON or CSV, not a custom DDT-like API. Keep each row isolated.
+- API inside UI tests: use the `request` fixture or `APIRequestContext`, call `expect(response.ok()).toBeTruthy();` and assert on the returned JSON body.
+- Visual regression: `await expect(locator).toHaveScreenshot('chart.png');` and include a comment or note about updating baselines with `--update-snapshots` when baseline updates are needed.
+- Database verification: if DB access is required, use a Node client such as `pg`, `mssql`, or `mysql2` with connection info from environment variables. Do not invent `page.db`, `context.db`, or `playwright.query` APIs.
+- Optional elements: guard with `if (await locator.isVisible().catch(() => false)) { ... }` instead of fixed sleeps.
+- Infinite scroll: use a bounded retry loop or `expect.poll()` with a timeout; never use an infinite loop with hardcoded delays.
+- Spinner/AJAX waits: `await expect(page.locator('.spinner')).toBeHidden();` or `await expect(results).toBeVisible();`
+- Setup and teardown: map legacy startup/shutdown hooks to `test.beforeEach()`, `test.afterEach()`, `beforeAll`, `afterAll`, or global setup; rely on the Playwright-managed `page` fixture and do not manually call `page.close()` unless clearly necessary.
+- Authentication persistence: prefer a setup project or global setup that logs in once and saves `storageState` for reuse. Do not hardcode credentials or keep plaintext secrets in test code.
+- File handling: prefer `path.resolve(__dirname, ...)` or env-driven relative paths over raw absolute Windows paths.
+
+Do not do this:
+- `page.on('dialog', ...)` after the click
+- `await page.waitForEvent('download'); await page.getByRole(...).click();` followed by a second click
+- `const [popup] = await Promise.all([context.waitForEvent('page'), page.getByRole(...).click()]);` followed by another separate click on the same element
+- Hardcoded login credentials or `decrypted_pwd`
+- `while (true) { ... await page.waitForTimeout(500); }` or other fixed-delay polling loops
+- `page.close()` inside `afterEach` when Playwright already owns the page lifecycle
+
+Legacy Code:
+{{legacy_script}}

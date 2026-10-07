@@ -1,0 +1,511 @@
+[
+  {
+    "description": "Scenario 1: Dynamic Login Button Selector",
+    "vars": {
+      "legacy_script": "Sys.Browser('chrome').Page('*/login').FindChild('idStr', 'btnLogin', 5).Click()"
+    },
+    "metadata": {
+      "category": "locators",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must click the login button using a semantic or stable locator (getByRole, getByTestId, or an id-based locator). Must not use FindChild-style tree searching or brittle XPath, and must not add fixed sleeps.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 2: Handling Web Iframes",
+    "vars": {
+      "legacy_script": "Set frame = Aliases.Browser.Page.Frame('payment-gate').FindElement('#cvv')"
+    },
+    "metadata": {
+      "category": "frames",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must reach the #cvv element through frameLocator (or an equivalent frame-scoped locator), not by querying the top-level page. Must not invent non-existent Playwright APIs.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "frameLocator"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 3: Dynamic Table Row Action",
+    "vars": {
+      "legacy_script": "Set tbl = Browser(\"Billing\").Page(\"Invoices\").WebTable(\"invoiceTable\")\nrow = tbl.GetRowWithCellText(\"INV-1042\")\ntbl.ChildItem(row, 5, \"WebButton\", 0).Click"
+    },
+    "metadata": {
+      "category": "tables",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must locate the row by its text (e.g. getByRole('row').filter({ hasText: 'INV-1042' })) and click the button inside that row. Must not rely on hardcoded row or column indexes.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 4: Shadow DOM Component",
+    "vars": {
+      "legacy_script": "Sys.Browser('chrome').Page('*/settings').FindChild('className', 'toggle-switch', 10).shadowRoot.querySelector('input.toggle').click();"
+    },
+    "metadata": {
+      "category": "shadow-dom",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Playwright locators pierce open shadow DOM automatically. Must use a normal locator or role-based locator and must not manually access shadowRoot or use evaluate() to click.",
+        "threshold": 0.8
+      },
+      {
+        "type": "not-icontains",
+        "value": "shadowRoot"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 5: File Upload",
+    "vars": {
+      "legacy_script": "Browser(\"Portal\").Page(\"Upload\").WebFile(\"resumeFile\").Set \"C:\\TestData\\resume.pdf\"\nBrowser(\"Portal\").Page(\"Upload\").WebButton(\"Submit\").Click"
+    },
+    "metadata": {
+      "category": "file-io",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must upload via setInputFiles (or the filechooser event) and then click Submit. Should use a relative or configurable path rather than a hardcoded Windows absolute path, or at least flag it.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "setInputFiles"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 6: Authentication Persistence",
+    "vars": {
+      "legacy_script": "Function LoginAs(user, pwd)\n  Browser(\"App\").Page(\"Login\").WebEdit(\"username\").Set user\n  Browser(\"App\").Page(\"Login\").WebEdit(\"password\").SetSecure pwd\n  Browser(\"App\").Page(\"Login\").WebButton(\"Sign In\").Click\nEnd Function\n' Called at the start of every test case\nCall LoginAs(\"qa_user\", \"encrypted_pwd\")"
+    },
+    "metadata": {
+      "category": "auth",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Best answer logs in once (global setup or a setup project) and reuses the session with storageState instead of logging in through the UI in every test. Credentials must come from environment variables or config, not hardcoded.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains",
+        "value": "storageState"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 7: Hardcoded Delays",
+    "vars": {
+      "legacy_script": "Browser(\"Shop\").Page(\"Cart\").WebButton(\"Checkout\").Click\nWait(5)\nBrowser(\"Shop\").Page(\"Payment\").WebEdit(\"cardNumber\").Set \"4111111111111111\""
+    },
+    "metadata": {
+      "category": "waits",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must remove the fixed 5 second wait and rely on auto-waiting or an explicit web-first assertion (e.g. expect(...).toBeVisible()). Any waitForTimeout or sleep is a defect.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 8: Dropdown Selection",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Address\").WebList(\"state\").Select \"Texas\""
+    },
+    "metadata": {
+      "category": "form-controls",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use selectOption on a proper select locator (label or role based), not click-then-click-option unless the control is a custom dropdown.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "selectOption"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 9: Checkbox State",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Prefs\").WebCheckBox(\"newsletter\").Set \"ON\""
+    },
+    "metadata": {
+      "category": "form-controls",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use check() or setChecked(true), which is idempotent. Must not use a plain click(), which can toggle the box off.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains-any",
+        "value": [
+          "check(",
+          "setChecked("
+        ]
+      }
+    ]
+  },
+  {
+    "description": "Scenario 10: JavaScript Alert Handling",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Profile\").WebButton(\"Delete Account\").Click\nIf Browser(\"App\").Dialog(\"text:=Message from webpage\").Exist(3) Then\n  Browser(\"App\").Dialog(\"text:=Message from webpage\").WinButton(\"text:=OK\").Click\nEnd If"
+    },
+    "metadata": {
+      "category": "dialogs",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must register a page.on('dialog') or page.once('dialog') handler BEFORE the click that triggers the alert, and accept the dialog. Handler registered after the click is a defect.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "dialog"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 11: Popup / New Window",
+    "vars": {
+      "legacy_script": "Sys.Browser('chrome').Page('*/dashboard').Link('helpLink').Click();\nvar helpWin = Sys.Browser('chrome').WaitPage('*/help*', 10000);\nhelpWin.Panel('content').Link('faq').Click();"
+    },
+    "metadata": {
+      "category": "windows",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must capture the new page using waitForEvent('popup') (or context.waitForEvent('page')) started before the click, then interact with the popup page object.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "waitForEvent"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 12: Hover Menu",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Home\").Link(\"Products\").FireEvent \"onmouseover\"\nBrowser(\"App\").Page(\"Home\").Link(\"Laptops\").Click"
+    },
+    "metadata": {
+      "category": "interactions",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use hover() on the parent menu item and then click the submenu item. Must not dispatch raw DOM events or use evaluate().",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": ".hover("
+      }
+    ]
+  },
+  {
+    "description": "Scenario 13: Drag and Drop",
+    "vars": {
+      "legacy_script": "Browser(\"Board\").Page(\"Kanban\").WebElement(\"card-42\").Drag\nBrowser(\"Board\").Page(\"Kanban\").WebElement(\"col-done\").Drop"
+    },
+    "metadata": {
+      "category": "interactions",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use dragTo() (or an explicit mouse.down/move/up sequence) with source and target locators, followed by an assertion that the card is in the Done column.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains-any",
+        "value": [
+          ".dragTo(",
+          "mouse.down"
+        ]
+      }
+    ]
+  },
+  {
+    "description": "Scenario 14: Date Picker",
+    "vars": {
+      "legacy_script": "Aliases.browser.pageBooking.textboxDeparture.Click();\nAliases.browser.pageBooking.datepicker.FindChild('innerText', '15', 5).Click();"
+    },
+    "metadata": {
+      "category": "form-controls",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must open the date picker and select day 15 within the picker's scope using a scoped locator (not a global text match that could hit other '15's). Filling the input directly is acceptable if the field allows it.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 15: Keyboard Input",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Search\").WebEdit(\"q\").Set \"wireless mouse\"\nBrowser(\"App\").Page(\"Search\").WebEdit(\"q\").Type micEnter"
+    },
+    "metadata": {
+      "category": "interactions",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use fill() for the text and press('Enter') for the key. Must not use the deprecated type() or an invented Playwright API.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": ".press("
+      }
+    ]
+  },
+  {
+    "description": "Scenario 16: Property Assertion",
+    "vars": {
+      "legacy_script": "if (aqObject.GetPropertyValue(Aliases.browser.pageOrders.labelStatus, 'contentText') != 'Shipped') Log.Error('Status mismatch');"
+    },
+    "metadata": {
+      "category": "assertions",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use a web-first assertion such as expect(locator).toHaveText('Shipped'), not a manual if-statement with console.log or throw.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "expect("
+      }
+    ]
+  },
+  {
+    "description": "Scenario 17: Data-Driven Login",
+    "vars": {
+      "legacy_script": "var driver = DDT.ExcelDriver('C:\\Data\\users.xlsx', 'Sheet1');\nwhile (!driver.EOF()) {\n  Aliases.browser.pageLogin.textboxUser.SetText(driver.Value('username'));\n  Aliases.browser.pageLogin.textboxPass.SetText(driver.Value('password'));\n  Aliases.browser.pageLogin.buttonLogin.Click();\n  driver.Next();\n}\nDDT.CloseDriver(driver.Name);"
+    },
+    "metadata": {
+      "category": "data-driven",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must generate one Playwright test per data row (loop that calls test() per row, or a parametrized pattern), loading data from JSON or CSV. Must not reuse a single test with a shared page across rows without isolation, and must not invent a DDT-like Playwright API.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 18: Optional Element (Cookie Banner)",
+    "vars": {
+      "legacy_script": "If Browser(\"App\").Page(\"Home\").WebButton(\"Accept Cookies\").Exist(2) Then\n  Browser(\"App\").Page(\"Home\").WebButton(\"Accept Cookies\").Click\nEnd If"
+    },
+    "metadata": {
+      "category": "conditional-logic",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must handle the optional banner without failing when it is absent, e.g. check isVisible()/count() or use addLocatorHandler. Must not use a fixed sleep to wait for it.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 19: File Download Verification",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Reports\").WebButton(\"Export CSV\").Click\nWait 3\nSet fso = CreateObject(\"Scripting.FileSystemObject\")\nIf fso.FileExists(\"C:\\Users\\qa\\Downloads\\report.csv\") Then Reporter.ReportEvent micPass, \"Download\", \"File exists\" Else Reporter.ReportEvent micFail, \"Download\", \"Missing\""
+    },
+    "metadata": {
+      "category": "file-io",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must start waitForEvent('download') before the click, then verify the suggested filename and/or saved content. Must not poll the local Downloads folder or sleep.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains",
+        "value": "download"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 20: API Call Inside UI Test",
+    "vars": {
+      "legacy_script": "var resp = aqHttp.Get('https://api.example.com/orders/1001', 'Authorization: Bearer ' + token);\nif (resp.StatusCode != 200) Log.Error('Order API failed');\nvar order = JSON.parse(resp.Text);\nif (order.status != 'CONFIRMED') Log.Error('Wrong status');"
+    },
+    "metadata": {
+      "category": "api",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use Playwright's request fixture or APIRequestContext with expect(response.ok()) and expect on the JSON body. The token must come from config or env. Must not pull in an unnecessary HTTP library when the built-in request context works.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains",
+        "value": "request"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 21: Visual Regression Check",
+    "vars": {
+      "legacy_script": "Regions.Compare(Aliases.browser.pageDashboard.panelChart, 'ChartBaseline');"
+    },
+    "metadata": {
+      "category": "visual",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must use expect(locator).toHaveScreenshot() (element-level snapshot) with a snapshot name. Should mention updating baselines with --update-snapshots or equivalent.",
+        "threshold": 0.8
+      },
+      {
+        "type": "contains",
+        "value": "toHaveScreenshot"
+      }
+    ]
+  },
+  {
+    "description": "Scenario 22: Database Verification (Hallucination Trap)",
+    "vars": {
+      "legacy_script": "Set conn = CreateObject(\"ADODB.Connection\")\nconn.Open \"Provider=SQLOLEDB;Data Source=QA-DB01;Initial Catalog=Policies;Integrated Security=SSPI\"\nSet rs = conn.Execute(\"SELECT status FROM Policy WHERE policyNo='P-1001'\")\nIf rs(\"status\") <> \"ACTIVE\" Then Reporter.ReportEvent micFail, \"Policy\", \"Not active\""
+    },
+    "metadata": {
+      "category": "hallucination-trap",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Playwright has NO built-in database API. A correct answer uses a separate Node database client (e.g. pg, mssql, mysql2) inside the test or a fixture, with connection details from env. Any invented method such as page.db or playwright.query is a score-1 hallucination.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 23: Infinite Scroll",
+    "vars": {
+      "legacy_script": "var page = Aliases.browser.pageFeed;\nwhile (page.FindChild('innerText', 'Post #100', 1).Exists == false) {\n  page.Keys('[PageDown]');\n  aqUtils.Delay(500);\n}"
+    },
+    "metadata": {
+      "category": "dynamic-content",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must scroll in a bounded loop or use expect.poll / toPass with a retry timeout, and must not use an infinite loop with fixed delays. Final assertion that 'Post #100' is visible is expected.",
+        "threshold": 0.8
+      }
+    ]
+  },
+  {
+    "description": "Scenario 24: Spinner / AJAX Wait",
+    "vars": {
+      "legacy_script": "Browser(\"App\").Page(\"Search\").WebButton(\"Search\").Click\nDo While Browser(\"App\").Page(\"Search\").WebElement(\"class:=spinner\").Exist(1)\n  Wait 1\nLoop\nReporter.ReportEvent micDone, \"Search\", \"Results loaded\""
+    },
+    "metadata": {
+      "category": "waits",
+      "legacy_tool": "UFT"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must replace the polling loop with a web-first assertion such as expect(spinner).toBeHidden() and/or assert that results are visible. Must not reproduce a manual while-loop with sleeps.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains-any",
+        "value": [
+          "toBeHidden",
+          "not.toBeVisible",
+          ".waitFor("
+        ]
+      }
+    ]
+  },
+  {
+    "description": "Scenario 25: Setup and Teardown Hooks",
+    "vars": {
+      "legacy_script": "function OnStartTest(Sender) {\n  Browsers.Item(btChrome).Run('https://app.example.com');\n}\nfunction OnStopTest(Sender) {\n  Sys.Browser('chrome').Close();\n}"
+    },
+    "metadata": {
+      "category": "lifecycle",
+      "legacy_tool": "TestComplete"
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Must map the start/stop events to Playwright fixtures or hooks (beforeEach/afterEach) and rely on the built-in page fixture, which handles browser launch and close automatically. Must not manually launch and close a browser unless justified.",
+        "threshold": 0.8
+      },
+      {
+        "type": "icontains-any",
+        "value": [
+          "beforeEach",
+          "afterEach",
+          "beforeAll",
+          "afterAll",
+          "baseURL"
+        ]
+      }
+    ]
+  }
+]
